@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.js.map
+
+# Environment / Secrets — NEVER commit these
+.env
+.env.local
+.env.production
+.env.*
+
+.vercel
