@@ -916,3 +916,100 @@
     at Object.transformer (D:\variska\backend\node_modules\tsx\dist\register-D46fvsV_.cjs:3:1104)
     at Module.load (node:internal/modules/cjs/loader:1313:32)
     at Function._load (node:internal/modules/cjs/loader:1123:12)
+2026-05-07 14:11:11 error: Error: The server does not support SSL connections
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:122:25
+2026-05-07 14:11:18 error: Error: The server does not support SSL connections
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:122:25
+2026-05-07 14:11:19 error: Error: The server does not support SSL connections
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:129:22
+2026-05-07 14:11:19 error: Error: The server does not support SSL connections
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:122:25
+2026-05-07 14:11:21 error: Error: The server does not support SSL connections
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:129:22
+2026-05-07 14:11:23 error: Error: The server does not support SSL connections
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:122:25
+2026-05-07 14:36:20 error: Error: The server does not support SSL connections
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:129:22
+2026-05-07 14:36:20 error: Error: The server does not support SSL connections
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:122:25
+2026-05-07 14:48:09 error: Error: Connection terminated due to connection timeout
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:122:25
+2026-05-07 14:48:10 error: Error: Connection terminated due to connection timeout
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:129:22
+2026-05-07 14:49:20 error: Error: Connection terminated due to connection timeout
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:129:22
+2026-05-07 14:49:20 error: Error: Connection terminated due to connection timeout
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:122:25
+2026-05-07 14:49:39 error: Error: Connection terminated due to connection timeout
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:129:22
+2026-05-07 14:49:39 error: Error: Connection terminated due to connection timeout
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:122:25
+2026-05-07 14:50:02 error: Error: Connection terminated due to connection timeout
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:129:22
+2026-05-07 14:50:02 error: Error: Connection terminated due to connection timeout
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\products.js:122:25
+2026-05-08 21:14:26 error: Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at Function.listen (D:\Varisca-live\varisca-backend\node_modules\express\lib\application.js:635:24)
+    at pool (D:\Varisca-live\varisca-backend\src\index.ts:217:7)
+    at Object.<anonymous> (D:\Varisca-live\varisca-backend\src\index.ts:220:1)
+    at Module._compile (node:internal/modules/cjs/loader:1562:14)
+    at Object.transformer (D:\Varisca-live\varisca-backend\node_modules\tsx\dist\register-D46fvsV_.cjs:3:1104)
+    at Module.load (node:internal/modules/cjs/loader:1313:32)
+    at Function._load (node:internal/modules/cjs/loader:1123:12)
+2026-05-08 21:44:52 error: Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at Function.listen (D:\Varisca-live\varisca-backend\node_modules\express\lib\application.js:635:24)
+    at pool (D:\Varisca-live\varisca-backend\src\index.ts:225:7)
+    at Object.<anonymous> (D:\Varisca-live\varisca-backend\src\index.ts:228:1)
+    at Module._compile (node:internal/modules/cjs/loader:1562:14)
+    at Object.transformer (D:\Varisca-live\varisca-backend\node_modules\tsx\dist\register-D46fvsV_.cjs:3:1104)
+    at Module.load (node:internal/modules/cjs/loader:1313:32)
+    at Function._load (node:internal/modules/cjs/loader:1123:12)
+2026-05-10 14:21:23 error: Error: Connection terminated due to connection timeout
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\customers.js:392:18
+2026-05-10 14:23:20 error: Error: Connection terminated due to connection timeout
+    at D:\Varisca-live\varisca-backend\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D:\Varisca-live\varisca-backend\dist\routes\customers.js:392:18
+2026-05-10 17:11:49 error: Error: Razorpay authentication failed. Use a valid Key Id and Key Secret pair from the same Razorpay dashboard (Settings → API Keys). Test and live keys are not interchangeable.
+    at D:\Varisca-live\varisca-backend\dist\routes\payment.js:104:19
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)

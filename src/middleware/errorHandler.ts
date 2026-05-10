@@ -33,18 +33,44 @@ const GENERIC_ERROR_MESSAGES = {
   503: 'Service unavailable. Please try again later.',
 };
 
+function resolveError(err: unknown): { statusCode: number; message: string; stack?: string } {
+  if (err instanceof AppError) {
+    return { statusCode: err.statusCode, message: err.message, stack: err.stack };
+  }
+  if (err instanceof Error) {
+    const ae = err as ApiError;
+    return {
+      statusCode: typeof ae.statusCode === 'number' ? ae.statusCode : 500,
+      message: err.message,
+      stack: err.stack,
+    };
+  }
+  // Razorpay SDK throws plain objects: { statusCode, error: { description, code } }
+  if (err && typeof err === 'object' && 'statusCode' in err) {
+    const o = err as { statusCode?: number; error?: { description?: string; code?: string; reason?: string } };
+    const statusCode = typeof o.statusCode === 'number' ? o.statusCode : 502;
+    const message =
+      o.error?.description ||
+      o.error?.reason ||
+      o.error?.code ||
+      'Payment provider error';
+    return { statusCode, message };
+  }
+  return { statusCode: 500, message: 'Internal server error' };
+}
+
 export function errorHandler(
-  err: ApiError,
+  err: unknown,
   req: Request,
   res: Response,
   next: NextFunction
 ): void {
-  let { statusCode = 500, message } = err;
+  let { statusCode, message, stack } = resolveError(err);
 
   // Log detailed error for debugging
   const errorDetails = {
-    message: err.message,
-    stack: err.stack,
+    message,
+    stack,
     url: req.url,
     method: req.method,
     ip: req.ip,
@@ -53,9 +79,9 @@ export function errorHandler(
   };
 
   if (statusCode >= 500) {
-    logger.error(`Server Error: ${err.message}`, errorDetails);
+    logger.error(`Server Error: ${message}`, errorDetails);
   } else {
-    logger.warn(`Client Error: ${err.message}`, errorDetails);
+    logger.warn(`Client Error: ${message}`, errorDetails);
   }
 
   // Don't leak raw stack in production; keep 422 validation messages readable in admin UI
@@ -63,9 +89,20 @@ export function errorHandler(
 
   if (!isDevelopment) {
     if (statusCode >= 500) {
-      message = GENERIC_ERROR_MESSAGES[500];
+      const keepOperationalDetail = err instanceof AppError && err.isOperational;
+      if (!keepOperationalDetail) {
+        message = GENERIC_ERROR_MESSAGES[500];
+      }
     } else if (statusCode >= 400 && statusCode < 500 && statusCode !== 422) {
-      message = GENERIC_ERROR_MESSAGES[statusCode as keyof typeof GENERIC_ERROR_MESSAGES] || GENERIC_ERROR_MESSAGES[400];
+      // Do not map Razorpay/auth-style 401 to "please log in" — that misleads storefront users
+      const pathKey = `${req.baseUrl || ''}${req.path || ''}${req.originalUrl || ''}`;
+      if (statusCode === 401 && pathKey.includes('/payment')) {
+        message =
+          'Payment could not be started. Razorpay rejected the credentials on the server — check RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.';
+      } else {
+        message =
+          GENERIC_ERROR_MESSAGES[statusCode as keyof typeof GENERIC_ERROR_MESSAGES] || GENERIC_ERROR_MESSAGES[400];
+      }
     }
     // 422: keep Joi / validation message so admins can fix the form
   }
@@ -73,8 +110,8 @@ export function errorHandler(
   res.status(statusCode).json({
     error: message,
     ...(isDevelopment && {
-      stack: err.stack,
-      details: err.message,
+      stack,
+      details: err instanceof Error ? err.message : undefined,
     }),
   });
 }

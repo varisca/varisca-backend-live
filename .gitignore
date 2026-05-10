@@ -9,3 +9,4 @@ dist/
 .env.*
 
 .vercel
+serviceAccountKey.json/

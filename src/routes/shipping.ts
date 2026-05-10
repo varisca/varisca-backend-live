@@ -1,8 +1,13 @@
 // ─── Shipping Routes ────────────────────────────────────────────────
 import { Router } from 'express';
+import { authMiddleware } from '../middleware/auth';
 import { createCrudRouter } from './crud-factory';
+import delhiveryRoutes from './delhivery';
 
 const router = Router();
+
+// Delhivery client warehouses (admin JWT) — also available at /api/delhivery/*
+router.use('/delhivery', authMiddleware, delhiveryRoutes);
 
 // Delivery Zones
 router.use('/zones', createCrudRouter({

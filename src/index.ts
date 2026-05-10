@@ -12,6 +12,7 @@ import { errorHandler, asyncHandler } from './middleware/errorHandler';
 
 // Route imports
 import authRoutes from './routes/auth';
+import otpAuthRoutes from './routes/authRoutes';
 import productRoutes, { productFiltersHandler } from './routes/products';
 import categoryRoutes from './routes/categories';
 import brandRoutes from './routes/brands';
@@ -28,6 +29,7 @@ import financeRoutes from './routes/finance';
 import returnsRefundsRoutes from './routes/returns-refunds';
 import customOrderRoutes from './routes/custom-orders';
 import paymentRoutes, { handlePaymentWebhook } from './routes/payment';
+import delhiveryRoutes from './routes/delhivery';
 
 const app = express();
 app.set('trust proxy', 1);
@@ -95,12 +97,20 @@ const customOrderLimiter = rateLimit({
 // ─── CORS ────────────────────────────────────────────────────────────
 const allowedOrigins = [
   "https://varisca.in",
-  "https://www.varisca.in"
+  "https://www.varisca.in",
+  // Local dev (Vite default)
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  // Other common local ports (preview/proxy)
+  "http://localhost:8080",
+  "http://127.0.0.1:8080",
 ];
 
 const corsOptions = {
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     if (!origin) return callback(null, true);
+    // In development, allow all origins to avoid CORS blocking local testing.
+    if (!isProd) return callback(null, true);
     if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
       return callback(null, true);
     }
@@ -157,6 +167,7 @@ app.get('/', (_req, res) => {
 // ─── Routes ──────────────────────────────────────────────────────────
 app.use('/api/auth/login', loginLimiter);
 app.use('/api/auth', authRoutes);
+app.use('/api/auth', otpAuthRoutes);
 
 app.use('/api/customers/auth/register', registerLimiter);
 app.use('/api/customers/auth/login', loginLimiter);
@@ -186,6 +197,7 @@ app.use('/api/reports', authMiddleware, reportRoutes);
 app.use('/api/admin-users', authMiddleware, adminUserRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/shipping', shippingRoutes);
+app.use('/api/delhivery', authMiddleware, delhiveryRoutes);
 app.use('/api/marketing', authMiddleware, marketingRoutes);
 app.use('/api/finance', authMiddleware, financeRoutes);
 app.use('/api/returns-refunds', returnsRefundsRoutes);

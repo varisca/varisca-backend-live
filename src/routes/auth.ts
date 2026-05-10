@@ -69,6 +69,19 @@ router.post('/login', async (req: Request, res: Response) => {
 // GET /api/auth/me
 router.get('/me', authMiddleware, async (req: Request, res: Response) => {
   try {
+    if (req.user?.role === 'customer') {
+      const customer = await pool.query(
+        'SELECT id, name, first_name, last_name, email, phone, created_at FROM customers WHERE id = $1 AND is_deleted = FALSE',
+        [req.user.userId]
+      );
+      if (customer.rows.length === 0) {
+        res.status(404).json({ error: 'Customer not found' });
+        return;
+      }
+      res.json(customer.rows[0]);
+      return;
+    }
+
     const { rows } = await pool.query(
       'SELECT id, name, email, role, status, last_login, created_at FROM admin_users WHERE id = $1 AND is_deleted = FALSE',
       [req.user!.userId]

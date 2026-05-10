@@ -5,6 +5,8 @@ import Joi from 'joi';
 import pool from '../db';
 import logger from '../utils/logger';
 import { signToken, customerAuthMiddleware } from '../middleware/auth';
+import { sendEmailOtp, verifyEmailOtp } from '../services/emailOtpService';
+import { isPincodeServiceable } from '../services/delhiveryPincodeService';
 
 
 const router = Router();
@@ -45,6 +47,26 @@ const loginSchema = Joi.object({
   password: Joi.string().min(1).required().messages({
     'any.required': 'Password is required',
   }),
+});
+
+const emailOtpRequestSchema = Joi.object({
+  first_name: Joi.string().trim().min(1).max(100).required().messages({
+    'string.empty': 'First name is required',
+    'any.required': 'First name is required',
+  }),
+  last_name: Joi.string().trim().min(1).max(100).required().messages({
+    'string.empty': 'Last name is required',
+    'any.required': 'Last name is required',
+  }),
+  email: Joi.string().email().lowercase().trim().required().messages({
+    'string.email': 'A valid email address is required',
+    'any.required': 'Email is required',
+  }),
+});
+
+const emailOtpVerifySchema = Joi.object({
+  email: Joi.string().email().lowercase().trim().required(),
+  otp: Joi.string().trim().min(4).max(10).required(),
 });
 
 // ─── Address Joi Schema ───────────────────────────────────────────────
@@ -176,6 +198,44 @@ router.post('/auth/login', async (req: Request, res: Response) => {
   }
 });
 
+// ─── POST /api/customers/auth/otp/email/request ──────────────────────
+router.post('/auth/otp/email/request', async (req: Request, res: Response) => {
+  const { error, value } = emailOtpRequestSchema.validate(req.body, { abortEarly: false });
+  if (error) {
+    res.status(400).json({ error: error.details.map(d => d.message).join('; ') });
+    return;
+  }
+
+  try {
+    const result = await sendEmailOtp({
+      firstName: value.first_name,
+      lastName: value.last_name,
+      emailInput: value.email,
+    });
+    res.json(result);
+  } catch (err: any) {
+    const status = err?.statusCode || err?.status || 500;
+    res.status(status).json({ error: err?.message || 'An internal error occurred' });
+  }
+});
+
+// ─── POST /api/customers/auth/otp/email/verify ───────────────────────
+router.post('/auth/otp/email/verify', async (req: Request, res: Response) => {
+  const { error, value } = emailOtpVerifySchema.validate(req.body, { abortEarly: false });
+  if (error) {
+    res.status(400).json({ error: error.details.map(d => d.message).join('; ') });
+    return;
+  }
+
+  try {
+    const result = await verifyEmailOtp(value.email, value.otp);
+    res.json(result);
+  } catch (err: any) {
+    const status = err?.statusCode || err?.status || 500;
+    res.status(status).json({ error: err?.message || 'An internal error occurred' });
+  }
+});
+
 // ─── GET /api/customers/auth/me ──────────────────────────────────────
 router.get('/auth/me', customerAuthMiddleware, async (req: Request, res: Response) => {
 
@@ -236,6 +296,59 @@ router.put('/auth/me', customerAuthMiddleware, async (req: Request, res: Respons
     }
     logger.error(`Customer profile update failed: ${err.message}`, { stack: err.stack });
     res.status(500).json({ error: 'An internal error occurred' });
+  }
+});
+
+// POST /api/customers/auth/addresses/:addrId/verify-pincode — Delhivery pin serviceability + persist pincode_servicable
+router.post('/auth/addresses/:addrId/verify-pincode', customerAuthMiddleware, async (req: Request, res: Response) => {
+  const customerId = req.user!.userId;
+  const { addrId } = req.params;
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, pincode FROM customer_addresses WHERE id = $1 AND customer_id = $2`,
+      [addrId, customerId],
+    );
+    if (rows.length === 0) {
+      logger.warn(`verify-pincode: no address id=${addrId} for customer_id=${customerId}`);
+      res.status(404).json({
+        error:
+          'Address not found for this account. Try adding the address again, or log out and back in so your session matches your saved addresses.',
+        code: 'CUSTOMER_ADDRESS_NOT_FOUND',
+      });
+      return;
+    }
+
+    const pin = String(rows[0].pincode || '').trim();
+    const normalized = pin.replace(/\D/g, '');
+    if (normalized.length < 6) {
+      res.status(400).json({ error: 'Please enter a valid 6-digit pincode on this address.' });
+      return;
+    }
+
+    const serviceable = await isPincodeServiceable(pin);
+
+    const { rows: updated } = await pool.query(
+      `UPDATE customer_addresses
+       SET pincode_servicable = $1, updated_at = NOW()
+       WHERE id = $2 AND customer_id = $3
+       RETURNING *`,
+      [serviceable, addrId, customerId],
+    );
+
+    res.json({
+      serviceable,
+      pincode_servicable: serviceable,
+      address: updated[0],
+    });
+  } catch (err: any) {
+    logger.error(`Verify pincode failed: ${err.message}`, { stack: err.stack });
+    const msg = err?.message || 'Pincode verification failed';
+    if (/authentication failed|not available/i.test(msg)) {
+      res.status(503).json({ error: msg });
+      return;
+    }
+    res.status(500).json({ error: msg });
   }
 });
 

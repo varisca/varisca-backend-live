@@ -43,7 +43,9 @@ function assertOrderAccess(
   const em = email.trim().toLowerCase();
   const orderEm = String(order.customer_email).trim().toLowerCase();
   if (req.user && req.user.role === 'customer') {
-    if (order.customer_id && order.customer_id !== req.user.userId) {
+    const oid = order.customer_id ? String(order.customer_id) : '';
+    const uid = String(req.user.userId || '');
+    if (oid && uid && oid !== uid) {
       throw new AppError('Forbidden — order belongs to another account', 403);
     }
     if (!order.customer_id && em !== orderEm) {
@@ -107,15 +109,33 @@ router.post(
     const amountPaise = Math.round(expectedRupees * 100);
     const rz = await getRazorpay();
 
-    const rzOrder = await rz.orders.create({
-      amount: amountPaise,
-      currency: 'INR',
-      receipt: `ord_${String(orderId).slice(0, 8)}_${Date.now()}`,
-      notes: {
-        order_id: orderId,
-        ...(order.customer_id ? { customer_id: order.customer_id } : {}),
-      },
-    });
+    let rzOrder: { id: string; amount: string | number; currency: string };
+    try {
+      rzOrder = (await rz.orders.create({
+        amount: amountPaise,
+        currency: 'INR',
+        receipt: `ord_${String(orderId).slice(0, 8)}_${Date.now()}`,
+        notes: {
+          order_id: orderId,
+          ...(order.customer_id ? { customer_id: order.customer_id } : {}),
+        },
+      })) as { id: string; amount: string | number; currency: string };
+    } catch (e: unknown) {
+      const raw = e as { statusCode?: number; error?: { description?: string; code?: string } };
+      logger.warn('Razorpay orders.create failed', { statusCode: raw?.statusCode, error: raw?.error });
+      const desc = raw?.error?.description || raw?.error?.code || 'Razorpay request failed';
+      if (raw?.statusCode === 401) {
+        throw new AppError(
+          'Razorpay authentication failed. Use a valid Key Id and Key Secret pair from the same Razorpay dashboard (Settings → API Keys). Test and live keys are not interchangeable.',
+          502,
+        );
+      }
+      const sc =
+        typeof raw?.statusCode === 'number' && raw.statusCode >= 400 && raw.statusCode < 600
+          ? raw.statusCode
+          : 502;
+      throw new AppError(`Could not start payment: ${desc}`, sc);
+    }
 
     await pool.query(
       `INSERT INTO payments (
