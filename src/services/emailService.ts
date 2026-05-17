@@ -16,6 +16,15 @@ function getTransport() {
   });
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export async function sendOtpEmail(input: { email: string; otp: string; expiresMinutes: number }) {
   const transport = getTransport();
 
@@ -42,6 +51,47 @@ export async function sendOtpEmail(input: { email: string; otp: string; expiresM
   } catch (error: any) {
     logger.error('Email OTP send failed', { message: error?.message, email: input.email });
     throw new AppError('Failed to send OTP email. Please try again.', 502);
+  }
+}
+
+export async function sendContactEmail(input: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}) {
+  const transport = getTransport();
+  const subject = `Varisca contact: ${input.subject}`;
+  const text = [
+    'New contact form message',
+    '',
+    `Name: ${input.name}`,
+    `Email: ${input.email}`,
+    `Subject: ${input.subject}`,
+    '',
+    input.message,
+  ].join('\n');
+
+  try {
+    await transport.sendMail({
+      from: smtpConfig.from,
+      to: 'varisca.team@gmail.com',
+      replyTo: input.email,
+      subject,
+      text,
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.5">
+          <h2 style="margin: 0 0 12px 0;">New contact form message</h2>
+          <p style="margin: 0 0 8px 0;"><strong>Name:</strong> ${escapeHtml(input.name)}</p>
+          <p style="margin: 0 0 8px 0;"><strong>Email:</strong> ${escapeHtml(input.email)}</p>
+          <p style="margin: 0 0 16px 0;"><strong>Subject:</strong> ${escapeHtml(input.subject)}</p>
+          <div style="white-space: pre-wrap; border-top: 1px solid #eee; padding-top: 16px;">${escapeHtml(input.message)}</div>
+        </div>
+      `,
+    });
+  } catch (error: any) {
+    logger.error('Contact email send failed', { message: error?.message, email: input.email });
+    throw new AppError('Failed to send message. Please try again or email varisca.team@gmail.com directly.', 502);
   }
 }
 

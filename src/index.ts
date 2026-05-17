@@ -30,6 +30,7 @@ import returnsRefundsRoutes from './routes/returns-refunds';
 import customOrderRoutes from './routes/custom-orders';
 import paymentRoutes, { handlePaymentWebhook } from './routes/payment';
 import delhiveryRoutes from './routes/delhivery';
+import contactRoutes from './routes/contact';
 
 const app = express();
 app.set('trust proxy', 1);
@@ -204,6 +205,8 @@ app.use('/api/returns-refunds', returnsRefundsRoutes);
 app.use('/api/custom-orders', customOrderLimiter);
 app.use('/api/custom-orders', customOrderRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/contact', contactLimiter);
+app.use('/api/contact', contactRoutes);
 
 // ─── Test DB route (optional, keep for debugging) ───────────────────
 app.get('/test-db', async (req, res) => {
