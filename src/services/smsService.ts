@@ -14,10 +14,13 @@ export async function sendOtpSms({ phone, otp }: SendOtpSmsInput): Promise<void>
   }
 
   const mobile = phone.replace(/\D/g, '');
+  const countryCode = msg91Config.countryCode || '91';
+  const formattedMobile = mobile.startsWith(countryCode) ? mobile : `${countryCode}${mobile}`;
+
   const payload = {
     template_id: msg91Config.templateId,
     authkey: msg91Config.authKey,
-    mobile: `${msg91Config.countryCode}${mobile}`,
+    mobile: formattedMobile,
     otp,
     otp_expiry: otpConfig.otpExpiryMinutes,
     otp_length: otpConfig.otpLength,
