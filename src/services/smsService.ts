@@ -17,6 +17,8 @@ export async function sendOtpSms({ phone, otp }: SendOtpSmsInput): Promise<void>
   const countryCode = msg91Config.countryCode || '91';
   const formattedMobile = mobile.startsWith(countryCode) ? mobile : `${countryCode}${mobile}`;
 
+  const url = `https://control.msg91.com/api/v5/otp?template_id=${encodeURIComponent(msg91Config.templateId)}&mobile=${encodeURIComponent(formattedMobile)}&authkey=${encodeURIComponent(msg91Config.authKey)}`;
+
   const payload = {
     template_id: msg91Config.templateId,
     authkey: msg91Config.authKey,
@@ -28,10 +30,11 @@ export async function sendOtpSms({ phone, otp }: SendOtpSmsInput): Promise<void>
   };
 
   try {
-    const response = await axios.post('https://control.msg91.com/api/v5/otp', payload, {
+    const response = await axios.post(url, payload, {
       timeout: msg91Config.timeoutMs,
       headers: {
         'Content-Type': 'application/json',
+        authkey: msg91Config.authKey,
       },
       validateStatus: () => true,
     });
