@@ -24,7 +24,7 @@ export async function sendOtpSms({ phone, otp }: SendOtpSmsInput): Promise<void>
     otp,
     otp_expiry: otpConfig.otpExpiryMinutes,
     otp_length: otpConfig.otpLength,
-    realTimeResponse: 1,
+    realTimeResponse: 0,
   };
 
   try {
@@ -36,9 +36,10 @@ export async function sendOtpSms({ phone, otp }: SendOtpSmsInput): Promise<void>
       validateStatus: () => true,
     });
 
-    if (response.status < 200 || response.status >= 300) {
+    if (response.status < 200 || response.status >= 300 || response.data?.type === 'error') {
       logger.error('MSG91 OTP send failed', { status: response.status, body: response.data, phone });
-      throw new AppError('Failed to send OTP. Please try again.', 502);
+      const errMsg = typeof response.data?.message === 'string' ? response.data.message : 'Failed to send OTP. Please try again.';
+      throw new AppError(errMsg, 502);
     }
   } catch (error: any) {
     if (error.code === 'ECONNABORTED') {

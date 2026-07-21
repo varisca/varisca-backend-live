@@ -3643,3 +3643,15 @@
     at endReadableNT (node:internal/streams/readable:1698:12)
     at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
 2026-07-20 21:47:31 info: ::ffff:127.0.0.1 - - [20/Jul/2026:16:17:31 +0000] "POST /api/auth/send-otp HTTP/1.1" 200 130 "-" "node"
+2026-07-21 18:44:01 info: ::1 - - [21/Jul/2026:13:14:01 +0000] "POST /api/auth/send-otp HTTP/1.1" 200 130 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2026-07-21 18:44:50 warn: SyntaxError: Bad escaped character in JSON at position 9 (line 1 column 10)
+    at JSON.parse (<anonymous>)
+    at parse (D:\Varisca-live\varisca-backend\node_modules\body-parser\lib\types\json.js:92:19)
+    at D:\Varisca-live\varisca-backend\node_modules\body-parser\lib\read.js:128:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:211:14)
+    at invokeCallback (D:\Varisca-live\varisca-backend\node_modules\raw-body\index.js:238:16)
+    at done (D:\Varisca-live\varisca-backend\node_modules\raw-body\index.js:227:7)
+    at IncomingMessage.onEnd (D:\Varisca-live\varisca-backend\node_modules\raw-body\index.js:287:7)
+    at IncomingMessage.emit (node:events:524:28)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
