@@ -28,6 +28,7 @@ import marketingRoutes from './routes/marketing';
 import financeRoutes from './routes/finance';
 import returnsRefundsRoutes from './routes/returns-refunds';
 import customOrderRoutes from './routes/custom-orders';
+import customOrderProductTypeRoutes from './routes/custom-order-product-types';
 import paymentRoutes, { handlePaymentWebhook } from './routes/payment';
 import delhiveryRoutes from './routes/delhivery';
 import contactRoutes from './routes/contact';
@@ -202,6 +203,10 @@ app.use('/api/delhivery', authMiddleware, delhiveryRoutes);
 app.use('/api/marketing', authMiddleware, marketingRoutes);
 app.use('/api/finance', authMiddleware, financeRoutes);
 app.use('/api/returns-refunds', returnsRefundsRoutes);
+app.use('/api/custom-order-product-types', (req, res, next) => {
+  if (req.method === 'GET' && req.path === '/') return next();
+  return authMiddleware(req, res, next);
+}, customOrderProductTypeRoutes);
 app.use('/api/custom-orders', customOrderLimiter);
 app.use('/api/custom-orders', customOrderRoutes);
 app.use('/api/payment', paymentRoutes);
